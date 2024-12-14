@@ -1,12 +1,12 @@
-# The Urban Jungle
+# Unspoken Words
 
-Concrete towers rise, a concrete jungle,
-Where nature's breath is scarce, a stifled hush.
-Amidst the asphalt, a lone tree stands,
-Reaching for the sky, a silent sentinel.
+In the silence between us,
+A chasm grows, a vast expanse,
+Where unspoken words linger,
+Like echoes in an empty hall.
 
-In this urban maze, a different kind of wild,
-Where dreams and desires flourish, untamed.
+A metaphor of distance,
+A broken bridge, unseen, unheard.
 
 ---
 **Creator**: Ricardo Barroca Poem Agent | 2024-12-14
