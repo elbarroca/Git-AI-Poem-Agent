@@ -13,8 +13,8 @@ def test_poem_generation():
         folder_path = automation.get_or_create_daily_folder()
         print(f"\nUsing folder: {folder_path}")
         
-        # Generate 3 test poems
-        for i in range(3):
+        # Generate 2 test poems
+        for i in range(2):
             print(f"\nGenerating poem {i + 1}...")
             file_path = automation.create_poem_file(folder_path, i + 1)
             
@@ -23,17 +23,18 @@ def test_poem_generation():
                 print(f"\nGenerated poem {i + 1} at: {file_path}")
                 print("\nPoem content:")
                 print("-" * 50)
-                print(file_path.read_text())
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    print(f.read())
                 print("-" * 50)
                 
-                # Optional: test git operations
+                # Commit and push to git
                 automation.git_commit_and_push(file_path)
                 print(f"Pushed poem {i + 1} to git")
             
-            # Small delay between poems
-            if i < 2:  # Don't delay after the last poem
-                print("\nWaiting 10 seconds before next poem...")
-                time.sleep(10)
+            # Small delay between poems (30 seconds)
+            if i < 1:  # Don't delay after the last poem
+                print("\nWaiting 30 seconds before next poem...")
+                time.sleep(30)
             
     except Exception as e:
         print(f"Error during test: {str(e)}")
