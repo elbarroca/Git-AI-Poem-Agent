@@ -1,59 +1,78 @@
-# 🤖 Git-AI Poem Agent: Automating Creativity, One Commit at a Time  
+# 🤖 Git-AI Poem Agent: Bussin' Bars While Git Stays Lit fr fr
 
-_"Skibidi dop dop yes yes bro,  
-Git commits flow like TikTok glow.  
-Boomers gasp at this Gen Z grind,  
-Poems and code, perfectly combined.  
+_"AI's in the studio, dropping heat,  
+Twenty-eight commits make the day complete.  
+Not about the grind or GitHub flex,  
+Just vibing with poetry, what comes next?_
 
-Green squares don’t mean you’re elite,  
-It’s vibes and passion that make you sweet.  
-Commit counts? Just flex, don’t stress,  
-Poetry in Git is how we impress."_  
+_Automation's the key, no cap fr fr,  
+Let the bot cook while we're living care-free.  
+Each poem hits different, that's the tea,  
+In this creative space, we're all meant to be."_
+
+## 🎯 The Real Talk
+
+Git-AI Poem Agent isn't your average contribution farmer - it's a whole mood. This bot:
+- 📝 Drops 28 unique poems daily using Cohere's AI
+- 🔄 Auto-commits throughout the day (starting 8 AM)
+- 🎨 Creates dedicated folders for each day's poetry collection
+- 🤝 Proves AI can keep it fresh without the copy-paste nonsense
+
+### Why Though? 
+Because we're tired of:
+- GitHub contribution graphs being the whole personality
+- Manual content creation when robots can do it better
+- Boring repos without creative vibes
+- Taking ourselves too seriously in tech
+
+## 🛠 How This Bad Boy Works
+
+### The Daily Routine
+1. **Wake Up Call (8 AM)**
+   - Bot starts its daily grind
+   - Creates a fresh folder for the day's content
+
+2. **The Poetry Flow**
+   - Generates one poem every 16 minutes
+   - Each poem gets its own markdown file
+   - Auto-commits and pushes to keep it real
+
+3. **Quality Control**
+   - Handles errors like a pro
+   - Keeps track of progress
+   - Makes sure we hit that 28-poem target
+
+## 💫 Features That Hit Different
+
+- **Smart Scheduling**: Starts at 8 AM daily
+- **Auto Recovery**: Picks up where it left off if interrupted
+- **Folder Management**: Keeps everything organized by date
+- **Git Integration**: Handles commits and pushes automatically
+- **Error Handling**: Keeps it pushing even when things get weird
+
+## 🚀 Get This Party Started
+
+### Prerequisites
+- Python 3.8+ (because we're not living in 2010)
+- Cohere API key (get it free at cohere.ai)
+- Git (duh)
+
+## 🎮 Configuration Options
+
+Edit `config.py` to customize:
+- API credentials
+- Repository path
+- Time settings
+- Poetry generation parameters
+
+## 🌟 Shoutouts
+
+- Cohere's LLM API for the poetry magic [@docs.cohere.com/v2/docs/chat-api](https://docs.cohere.com/v2/docs/chat-api)
+- My mom - the OG who brought this dev to the world fr fr 👑
+- That random dude at ETHGlobal Hackathon Team Finder who said my git was "wack af" - thanks for the inspiration
 
 ---
 
-## 🎉 What Is This All About?  
+*Remember: Your worth isn't measured in green squares. Keep creating, keep vibing, and let the AI handle the boring stuff.* 
 
-Welcome to **Git-AI Poem Agent**, where code meets creativity and Gen Z vibes rule the day. Forget about proving your worth with boring contribution graphs—this project automates the creation of **28 daily poetic commits** while dunking on outdated metrics.  
-
-What’s the tea?  
-- **Daily Poems**: Coere’s free API generates fresh, funny, or deep poems.  
-- **Automatic Commits**: These poems get committed to GitHub throughout the day.  
-- **Creative Experiment**: We’re testing how well AI can stay unique (and not copy-paste itself like a bad TikTok trend).  
-
-The real message: **Don’t judge devs by their GitHub profiles.** Just like your Skibidi Toilet dance doesn’t define your career potential, green squares don’t mean you’re the GOAT.
-
----
-
-## 📜 How It Works  
-
-This project is as simple as posting a meme to Twitter:  
-
-1. **Fetch the Vibes (Poems)**  
-   - The script (`poetry_commit.py`) hits Coere’s API to generate poems based on themes.  
-
-2. **Commit Like a Beast**  
-   - Each poem becomes a commit—spread across the day like your favorite posts on BeReal.  
-
-3. **Archive the Magic**  
-   - All poems live in `poems/`, a forever vault of your AI-generated bars.
-
----
-
-### 🗂️ Repository Structure  
-
-- **`poems/`**: Daily poetry files, saved like snaps in your streak.  
-- **`themes.json`**: Daily themes, because random poems are cringe.  
-- **`poetry_commit.py`**: The Python wizard that makes it all happen.  
-- **`config.json`**: Stores your Coere API key (aka your creative juice).  
-- **`daily_commit.yml`**: A GitHub Actions workflow that keeps the grind automated.  
-
----
-
-## 🛠️ Setup Instructions  
-
-### Step 1: Clone the Repo  
-First, steal—uh, I mean, clone this masterpiece:  
-```bash
-git clone https://github.com/elbarroca/Git-AI-Poem-Agent.git
-cd Git-AI-Poem-Agent
+**No cap fr fr** 🚫🧢
