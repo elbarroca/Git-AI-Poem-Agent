@@ -1,12 +1,13 @@
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
 
-# Configuration settings
+# Get environment variables
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
-REPO_PATH = os.getenv('REPO_PATH')
+REPO_PATH = os.path.dirname(os.path.abspath(__file__))
 
-if not COHERE_API_KEY or not REPO_PATH:
-    raise ValueError("Missing required environment variables. Please check your .env file.")
+# Validate required environment variables
+if not COHERE_API_KEY:
+    raise ValueError("COHERE_API_KEY environment variable is not set")

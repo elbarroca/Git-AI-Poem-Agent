@@ -127,20 +127,39 @@ class PoemAutomation:
             # Split the poem into parts
             lines = poem_text.strip().split('\n')
             
+            # Debug output
+            print("\nReceived poem text:")
+            print(poem_text)
+            print("\nSplit lines:")
+            print(lines)
+            
             # Extract title and content
             title_line = None
             content_lines = []
             
             for line in lines:
                 line = line.strip()
-                if line.startswith('Title:'):
+                if 'Title:' in line or line.startswith('#'):  # More flexible title detection
                     title_line = line
-                elif title_line and line:  # Only count non-empty lines after title
-                    content_lines.append(line)
+                elif line and not line.startswith('>') and not line.startswith('---'):  # Skip formatting lines
+                    # Skip empty lines, markdown formatting, and emoji-only lines
+                    if (line and not line.isspace() and 
+                        not line.startswith('*') and 
+                        not line.startswith('#') and
+                        not all(c in '✨🌌🌙🌊🎯🌠🌍💫🌟🐲🔢🎭💰🐒🤖🎮🌸🐧🚀🍵 ' for c in line)):
+                        content_lines.append(line)
             
-            # Verify we have content
-            if len(content_lines) < 1:
-                print(f"❌ Invalid poem structure: No content lines found")
+            # Verify we have a title
+            if not title_line:
+                print("❌ Invalid poem structure: No title found")
+                return False
+            
+            # Clean up content lines
+            content_lines = [line for line in content_lines if line.strip()]
+            
+            # Verify we have exactly 8 lines of content
+            if len(content_lines) != 8:
+                print(f"❌ Invalid poem structure: Found {len(content_lines)} lines, expected 8")
                 return False
             
             # Verify each line has meaningful content
@@ -158,7 +177,7 @@ class PoemAutomation:
             print(f"❌ Poem validation error: {str(e)}")
             return False
 
-    def format_poem_content(self, poem_text):
+    def format_poem_content(self, poem_text, themes_used):
         """Format the poem with enhanced Markdown in vertical format"""
         # Split into lines
         lines = poem_text.strip().split('\n')
@@ -177,10 +196,60 @@ class PoemAutomation:
         # Ensure we don't exceed 8 lines
         content_lines = content_lines[:8]
         
+        # Generate fun one-liner based on themes and content
+        one_liners = {
+            "Chinese Astrology": ["Zodiac vibes hitting different fr fr 🐲", "When the stars align but make it Gen Z"],
+            "Numerology": ["Numbers don't lie, but they do throw shade 🔢", "Math class but make it mystical"],
+            "Satirical Commentary": ["Spitting facts and taking names 🎭", "Reality check but make it funny"],
+            "Wealth and Freedom": ["Getting that bread, spiritually speaking 💰", "Rich in vibes, wealthy in wisdom"],
+            "Monkeys": ["Monke business going bananas 🐒", "Reject humanity, return to monke"],
+            "Technology and AI": ["AI and humans collabing, no cap 🤖", "When the robots pass the vibe check"],
+            "Traveling": ["Main character energy worldwide 🌍", "Passport stamps but make it poetic"],
+            "Gaming": ["Leveling up IRL and URL 🎮", "Touch grass? Nah, touch XP"],
+            "Botanic": ["Plant parents unite and photosyntheslay 🌸", "Grass touched, vibes received"],
+            "Penguins": ["Ice cold but make it waddle 🐧", "Squad goals: penguin edition"],
+            "Crypto": ["To the moon but make it philosophical 🚀", "HODL-ing onto dreams"],
+            "Japanese Philosophy": ["Zen and the art of keeping it real 🍵", "Finding peace in the chaos"]
+        }
+        
+        # Get primary theme and backup themes
+        primary_theme = themes_used[0]['theme'].split()[0] if themes_used else "Abstract"
+        theme_options = []
+        for theme in themes_used:
+            theme_key = theme['theme'].split()[0]
+            if theme_key in one_liners:
+                theme_options.extend(one_liners[theme_key])
+        
+        # Select a random one-liner from available themes
+        one_liner = random.choice(theme_options) if theme_options else "Vibes so good they transcend reality ✨"
+        
+        # Generate collection description based on themes
+        collection_descriptions = {
+            "Chinese Astrology": "Ancient wisdom meets modern perspective",
+            "Numerology": "Mystical patterns in everyday life",
+            "Satirical Commentary": "Sharp wit meets social insight",
+            "Wealth and Freedom": "Balance between material and spiritual",
+            "Monkeys": "Playful chaos and primal wisdom",
+            "Technology and AI": "Digital evolution and human connection",
+            "Traveling": "Journey through space and consciousness",
+            "Gaming": "Virtual realms and real-life parallels",
+            "Botanic": "Natural harmony and growth",
+            "Penguins": "Resilience and community spirit",
+            "Crypto": "Digital frontiers and financial freedom",
+            "Japanese Philosophy": "Eastern wisdom in modern times"
+        }
+        
+        # Get the primary theme (first theme used)
+        collection_desc = collection_descriptions.get(primary_theme, "A journey through consciousness and reality")
+        
+        # Format themes used
+        theme_list = [t['theme'] for t in themes_used]
+        themes_section = "**Themes**: " + " • ".join(theme_list)
+        
         # Format the final content with enhanced Markdown and vertical spacing
         formatted_content = f"""# {title}
 
-> *An abstract exploration through consciousness and time*
+> *{one_liner}*
 
 {chr(10).join([f"**{i+1}.** {line}{chr(10)}{chr(10)}" for i, line in enumerate(content_lines)])}
 
@@ -188,72 +257,112 @@ class PoemAutomation:
 
 *Generated on {datetime.datetime.now().strftime("%Y-%m-%d at %H:%M:%S")}*  
 **Creator**: Ricardo Barroca's AI Poetry Agent  
-**Theme**: Quantum Abstract Poetry  
-**Collection**: Daily Philosophical Reflections
-"""
+{themes_section}  
+**Collection**: {collection_desc}"""
+        
         return formatted_content, title
 
     def generate_poem(self, poem_number):
         """Generate a poem using Cohere API with context awareness"""
         context = self.get_poem_context()
         
-        # Define themes with guidelines
-        themes = {
-            "abstract concepts and consciousness": "Explore the nature of awareness, perception, and the self",
-            "time and existence": "Examine the relationship between temporality and being",
-            "dreams and surrealism": "Blend dream-like imagery with reality-bending concepts",
-            "cosmic interconnectedness": "Explore the unity of all things in the universe",
-            "metaphysical questions": "Investigate fundamental questions about reality and existence",
-            "emotional landscapes": "Map feelings onto abstract and physical terrains",
-            "quantum reality": "Explore quantum concepts like superposition and entanglement",
-            "collective unconscious": "Delve into shared human experiences and archetypes",
-            "metamorphosis and transformation": "Examine change and evolution of consciousness",
-            "infinite possibilities": "Explore the boundless nature of potential and existence"
-        }
+        # Define available themes
+        themes = [
+            {
+                "theme": "Chinese Astrology",
+                "description": "Zodiac wisdom, cosmic cycles, and destiny's dance 🐲"
+            },
+            {
+                "theme": "Numerology", 
+                "description": "Sacred numbers and life patterns 🔢"
+            },
+            {
+                "theme": "Satirical Commentary",
+                "description": "Witty takes on modern life's chaos 🎭"
+            },
+            {
+                "theme": "Wealth and Freedom",
+                "description": "Money moves and soul searching 💰"
+            },
+            {
+                "theme": "Monkeys",
+                "description": "Chaos masters and jungle vibes 🐒"
+            },
+            {
+                "theme": "Technology and AI",
+                "description": "Digital dreams and robot schemes 🤖"
+            },
+            {
+                "theme": "Traveling",
+                "description": "Wanderlust and world wonders 🌍"
+            },
+            {
+                "theme": "Gaming",
+                "description": "Level ups and epic quests 🎮"
+            },
+            {
+                "theme": "Botanic",
+                "description": "Green wisdom and nature's art 🌸"
+            },
+            {
+                "theme": "Penguins",
+                "description": "Ice cool squad goals 🐧"
+            },
+            {
+                "theme": "Crypto",
+                "description": "To the moon and back 🚀"
+            },
+            {
+                "theme": "Japanese Philosophy",
+                "description": "Zen vibes and mindful moments 🍵"
+            }
+        ]
         
-        # Select three themes randomly but weighted by poem number
-        base_theme = list(themes.keys())[poem_number % len(themes)]
-        other_themes = list(set(themes.keys()) - {base_theme})
-        import random
-        selected_themes = [base_theme] + random.sample(other_themes, 2)
+        # Select 2-4 themes randomly but weighted by poem number
+        num_themes = random.randint(2, 4)
+        selected_themes = random.sample(themes, num_themes)
         
-        # Get guidelines for selected themes
-        theme_guidelines = "\n".join([f"- {theme}: {themes[theme]}" for theme in selected_themes])
+        # Create theme prompts with emojis
+        theme_prompts = [f"{t['theme']} - {t['description']}" for t in selected_themes]
         
         prompt = f"""
-        Context: {context}
+        You are a Gen Z poet creating a fun and meaningful poem. Your task is to write an 8-line poem mixing these themes:
+        {chr(10).join('• ' + t for t in theme_prompts)}
 
-        Task: Create a concise abstract art poem (maximum 8 lines) that weaves together these three themes:
-        {theme_guidelines}
+        IMPORTANT FORMAT RULES:
+        1. Start with exactly: "Title: [Your Creative Title]"
+        2. Skip one line
+        3. Write exactly 8 lines of poem
+        4. Each line must be a complete thought
+        5. Do not add any extra text, numbers, or formatting
 
-        POETIC ELEMENTS TO INCLUDE:
-        * Imagery:
-          - Dense, powerful metaphors
-          - Abstract concepts distilled to essence
-          - Rich sensory details
-          - Deep philosophical insights
-        
-        * Techniques:
-          - Each line must be impactful and complete
-          - Mix different senses (synesthesia)
-          - Use internal rhymes and sound patterns
-          - Create unexpected connections
-        
-        * Structure:
-          - Maximum 8 lines total
-          - Each line should be meaningful and standalone
-          - Progress from concrete to abstract
-          - End with transcendental insight
-        
-        FORMAT:
-        1. Start with: "Title: [Your Abstract Title]"
-        2. Skip ONE line
-        3. Write your poem (maximum 8 lines)
-        4. Each line should be complete and powerful
-        5. Avoid clichés and common phrases
+        Style Guide:
+        • Keep it Gen Z fresh but authentic
+        • Include 2-3 emojis max in the whole poem
+        • Mix fun and deep vibes (60% fun, 40% deep)
+        • Make each line hit different
+        • Keep it relatable to 2024
+        Example Format:
 
-        Remember: Create a concentrated journey through abstract consciousness that combines all three themes.
-        Important: Only output the title and poem (max 8 lines), no additional text or formatting.
+        # Crypto Monkey Business
+
+        *Living that NFT life, swinging through the trees* 🐒
+
+        *Diamond hands hold tight, HODL with the breeze*
+
+        *In the digital jungle, where bananas grow*
+
+        *Smart contracts whisper, "To the moon we go"* 🚀
+
+        *Ancient wisdom says to trust the flow*
+
+        *But Web3's calling, time to steal the show*
+
+        *Monkey mindset in a blockchain game*
+
+        *Evolving daily, never quite the same* 🎮
+
+        Remember: EXACTLY 8 lines, no more, no less. Start with "Title: " and make it meaningful.
         """
 
         max_retries = 3
@@ -262,7 +371,7 @@ class PoemAutomation:
                 response = self.cohere.chat(
                     message=prompt,
                     model="command-r-plus-08-2024",
-                    temperature=0.92,  # Slightly increased for creativity
+                    temperature=0.92,
                     max_tokens=1000
                 )
                 
@@ -275,18 +384,16 @@ class PoemAutomation:
                 else:
                     poem_text = str(response).strip()
                 
+                # Debug output
+                print("\nGenerated poem text:")
+                print(poem_text)
+                
                 # Validate basic structure
-                if poem_text.startswith('Title:'):
-                    # Ensure we don't exceed 8 lines
-                    lines = poem_text.split('\n')
-                    title_line = lines[0]
-                    content_lines = [line for line in lines[1:] if line.strip()]
-                    if len(content_lines) > 8:
-                        content_lines = content_lines[:8]
-                    return title_line + '\n\n' + '\n'.join(content_lines)
-                else:
-                    print(f"Attempt {attempt + 1}: Invalid poem structure, retrying...")
-                    continue
+                if self.validate_poem_structure(poem_text):
+                    return poem_text, selected_themes
+                
+                print(f"Attempt {attempt + 1}: Invalid poem structure, retrying...")
+                continue
                     
             except Exception as e:
                 print(f"Error in attempt {attempt + 1}: {str(e)}")
@@ -376,25 +483,27 @@ class PoemAutomation:
         # Generate and validate the poem
         max_attempts = 3
         poem = None
+        themes = None
         
         for attempt in range(max_attempts):
             try:
-                generated_poem = self.generate_poem(index)
+                generated_poem, selected_themes = self.generate_poem(index)
                 if self.validate_poem_structure(generated_poem):
                     poem = generated_poem
+                    themes = selected_themes
                     break
                 else:
                     print(f"Attempt {attempt + 1}: Invalid poem structure, retrying...")
             except Exception as e:
                 print(f"Error in attempt {attempt + 1}: {str(e)}")
-                if attempt == max_retries - 1:
+                if attempt == max_attempts - 1:
                     raise
         
         if not poem:
             raise ValueError("Failed to generate a valid poem after multiple attempts")
         
         # Format the poem content
-        formatted_content, title = self.format_poem_content(poem)
+        formatted_content, title = self.format_poem_content(poem, themes)
         
         # Create file name with index for proper ordering
         sanitized_title = "".join(c for c in title if c.isalnum() or c in [' ', '-']).strip()
@@ -415,6 +524,7 @@ class PoemAutomation:
         print(f"\n✅ Created poem {index}:")
         print(f"Path: {file_path}")
         print(f"Title: {title}")
+        print(f"Themes: {' • '.join(t['theme'] for t in themes)}")
         
         return file_path
     
