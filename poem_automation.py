@@ -611,21 +611,57 @@ class PoemAutomation:
         """Run the daily automation process"""
         folder_path = self.get_or_create_daily_folder()
         
-        for i in range(28):
+        self.logger.info(f"Starting automation at {datetime.datetime.now()}")
+        self.logger.info(f"Using folder: {folder_path}")
+        
+        # Count existing poems to determine where to start
+        existing_poems = len(list(folder_path.glob("[0-9][0-9]_RB_*.md")))
+        start_number = existing_poems + 1
+        
+        self.logger.info(f"Found {existing_poems} existing poems. Starting from poem {start_number}")
+        
+        # Generate remaining poems sequentially with 8-minute intervals
+        for poem_number in range(start_number, 29):  # Continue until we have all 28
             try:
-                # Create poem file
-                file_path = self.create_poem_file(folder_path, i + 1)
-                if file_path and not file_path.exists():
-                    print(f"Created poem {i + 1} at {file_path}")
+                start_time = datetime.datetime.now()
+                self.logger.info(f"\nGenerating poem {poem_number}/28 at {start_time}")
+                
+                # Create the poem
+                file_path = self.create_poem_file(folder_path, poem_number)
+                
+                if file_path and file_path.exists():
+                    self.logger.info(f"Created poem at: {file_path}")
                     
-                    # Commit and push
+                    # Display poem content
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        self.logger.info("\nPoem content:")
+                        self.logger.info("-" * 50)
+                        self.logger.info(content)
+                        self.logger.info("-" * 50)
+                    
+                    # Commit and push this poem before waiting
                     self.git_commit_and_push(file_path)
-                    print(f"Pushed poem {i + 1} to git")
+                    self.logger.info(f"Successfully committed and pushed poem {poem_number}")
                     
-                    # Random delay between poems (1-3 minutes)
-                    delay = random.randint(60, 180)
-                    time.sleep(delay)
+                    # Calculate time spent on creation and push
+                    time_spent = (datetime.datetime.now() - start_time).total_seconds()
+                    
+                    # Wait remaining time to complete 8 minutes for operation if needed
+                    if time_spent < 8 * 60:
+                        remaining_operation_time = (8 * 60) - time_spent
+                        self.logger.info(f"\nWaiting {remaining_operation_time:.0f} seconds to complete 8-minute operation window...")
+                        time.sleep(remaining_operation_time)
+                    
+                    # If there's another poem to generate, wait 8 minutes
+                    if poem_number < 28:
+                        self.logger.info(f"Waiting 8 minutes before next poem...")
+                        time.sleep(8 * 60)  # 8 minutes wait
                 
             except Exception as e:
-                print(f"Error creating poem {i + 1}: {str(e)}")
-                continue 
+                self.logger.error(f"Error creating poem {poem_number}: {str(e)}")
+                # Wait a minute before retrying
+                time.sleep(60)
+                continue
+        
+        self.logger.info(f"\nCompleted daily automation at {datetime.datetime.now()}") 
