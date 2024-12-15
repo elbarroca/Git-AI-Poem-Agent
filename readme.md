@@ -1,13 +1,13 @@
 # 🤖 Git-AI Poem Agent: Bussin' Bars While Git Stays Lit fr fr
 
-_"AI's in the studio, dropping heat,
-Twenty-eight commits make the day complete.
-Not about the grind or GitHub flex,
-Just vibing with poetry, what comes next?
+_"AI's in the studio, dropping heat,  
+Twenty-eight commits make the day complete.  
+Not about the grind or GitHub flex,  
+Just vibing with poetry, what comes next?_
 
-Automation's the key, no cap fr fr,
-Let the bot cook while we're living care-free.
-Each poem hits different, that's the tea,
+_Automation's the key, no cap fr fr,  
+Let the bot cook while we're living care-free.  
+Each poem hits different, that's the tea,  
 In this creative space, we're all meant to be."_
 
 ## 🎯 The Real Talk
