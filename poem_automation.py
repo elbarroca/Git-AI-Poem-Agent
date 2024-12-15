@@ -5,6 +5,8 @@ from cohere import Client
 import git
 from pathlib import Path
 import time
+import logging
+from logging.handlers import RotatingFileHandler
 
 class PoemAutomation:
     def __init__(self, cohere_api_key, repo_path):
@@ -13,6 +15,78 @@ class PoemAutomation:
         self.repo = git.Repo(repo_path)
         self.daily_folder = None
         
+        # Set up logging
+        self._setup_logging()
+    
+    def _setup_logging(self):
+        """Configure logging to store logs in the logs folder"""
+        # Create logs directory if it doesn't exist
+        logs_dir = self.repo_path / "logs"
+        logs_dir.mkdir(exist_ok=True)
+        
+        # Create log files with timestamps
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
+        
+        # Main log file
+        main_log = logs_dir / f"poem_automation_{timestamp}.log"
+        
+        # Error log file
+        error_log = logs_dir / f"poem_automation_error_{timestamp}.log"
+        
+        # Configure main logger
+        self.logger = logging.getLogger('PoemAutomation')
+        self.logger.setLevel(logging.INFO)
+        
+        # Rotating file handler for main log (max 10MB per file, keep 5 backup files)
+        main_handler = RotatingFileHandler(
+            main_log,
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=5,
+            encoding='utf-8'
+        )
+        main_handler.setLevel(logging.INFO)
+        main_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        main_handler.setFormatter(main_formatter)
+        
+        # Rotating file handler for error log
+        error_handler = RotatingFileHandler(
+            error_log,
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=5,
+            encoding='utf-8'
+        )
+        error_handler.setLevel(logging.ERROR)
+        error_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\n%(exc_info)s')
+        error_handler.setFormatter(error_formatter)
+        
+        # Console handler
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_formatter = logging.Formatter('%(message)s')
+        console_handler.setFormatter(console_formatter)
+        
+        # Add handlers to logger
+        self.logger.addHandler(main_handler)
+        self.logger.addHandler(error_handler)
+        self.logger.addHandler(console_handler)
+        
+        # Clean up old log files
+        self._cleanup_old_logs(logs_dir)
+        
+        self.logger.info("Logging initialized successfully")
+    
+    def _cleanup_old_logs(self, logs_dir):
+        """Clean up log files older than 7 days"""
+        try:
+            current_time = datetime.datetime.now()
+            for log_file in logs_dir.glob("*.log*"):
+                file_time = datetime.datetime.fromtimestamp(log_file.stat().st_mtime)
+                if (current_time - file_time).days > 7:
+                    self.logger.info(f"Removing old log file: {log_file}")
+                    log_file.unlink()
+        except Exception as e:
+            self.logger.error(f"Error cleaning up old logs: {str(e)}")
+    
     def load_existing_poems(self):
         """Load all existing poems from today's folder"""
         if not self.daily_folder or not self.daily_folder.exists():
@@ -223,7 +297,7 @@ class PoemAutomation:
         raise ValueError("Failed to generate a valid poem after multiple attempts")
     
     def get_or_create_daily_folder(self):
-        """Get or create hierarchical folder structure: poems/YYYY/MM/Week_N/DD_Weekday"""
+        """Get or create hierarchical folder structure: poems/YYYY/MM_Month/DD_Weekday"""
         today = datetime.datetime.now()
         
         # Create base poems directory
@@ -234,30 +308,69 @@ class PoemAutomation:
         year_folder = poems_dir / str(today.year)
         year_folder.mkdir(exist_ok=True)
         
-        # Create month folder (MM)
-        month_folder = year_folder / today.strftime("%m_%B")  # e.g., "12_December"
+        # Create month folder (MM_MonthName)
+        month_name = today.strftime("%B")  # Full month name
+        month_folder = year_folder / f"{today.strftime('%m')}_{month_name}"
         month_folder.mkdir(exist_ok=True)
         
-        # Calculate week number within the month
-        week_number = (today.day - 1) // 7 + 1
-        weekly_folder = month_folder / f"Week_{week_number}"
-        weekly_folder.mkdir(exist_ok=True)
-        
         # Create daily folder with weekday name
-        daily_folder = weekly_folder / today.strftime("%d_%A")  # e.g., "15_Friday"
+        daily_folder = month_folder / today.strftime("%d_%A")  # e.g., "15_Friday"
         daily_folder.mkdir(exist_ok=True)
         
         # Print folder structure for visibility
-        print(f"\n📁 Poem Directory Structure:")
+        print(f"\n📁 Current Poetry Structure:")
         print(f"poems/")
         print(f"└── {year_folder.name}/")
         print(f"    └── {month_folder.name}/")
-        print(f"        └── {weekly_folder.name}/")
-        print(f"            └── {daily_folder.name}/")
+        print(f"        └── {daily_folder.name}/")
+        
+        # Clean up old files and empty folders
+        self._cleanup_old_folders(poems_dir, today)
         
         self.daily_folder = daily_folder
         return daily_folder
     
+    def _cleanup_old_folders(self, poems_dir, current_date):
+        """Clean up old folders and files, keeping only recent ones"""
+        try:
+            # Keep only current year and month
+            for year_dir in poems_dir.iterdir():
+                if not year_dir.is_dir():
+                    continue
+                
+                year = int(year_dir.name)
+                if year < current_date.year:
+                    self.logger.info(f"Removing old year folder: {year_dir}")
+                    import shutil
+                    shutil.rmtree(year_dir)
+                    continue
+                
+                # Clean up months in current year
+                for month_dir in year_dir.iterdir():
+                    if not month_dir.is_dir():
+                        continue
+                    
+                    month = int(month_dir.name.split('_')[0])
+                    if month < current_date.month:
+                        self.logger.info(f"Removing old month folder: {month_dir}")
+                        import shutil
+                        shutil.rmtree(month_dir)
+                        continue
+                    
+                    # Clean up days in current month
+                    for day_dir in month_dir.iterdir():
+                        if not day_dir.is_dir():
+                            continue
+                        
+                        day = int(day_dir.name.split('_')[0])
+                        if day < current_date.day:
+                            self.logger.info(f"Removing old day folder: {day_dir}")
+                            import shutil
+                            shutil.rmtree(day_dir)
+                            
+        except Exception as e:
+            self.logger.error(f"Error during cleanup: {str(e)}", exc_info=True)
+
     def create_poem_file(self, folder_path, index):
         """Create a file with a poem in the proper folder structure"""
         # Generate and validate the poem
@@ -274,7 +387,7 @@ class PoemAutomation:
                     print(f"Attempt {attempt + 1}: Invalid poem structure, retrying...")
             except Exception as e:
                 print(f"Error in attempt {attempt + 1}: {str(e)}")
-                if attempt == max_attempts - 1:
+                if attempt == max_retries - 1:
                     raise
         
         if not poem:
