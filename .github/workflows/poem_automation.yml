@@ -8,6 +8,7 @@ on:
 jobs:
   generate_poems:
     runs-on: ubuntu-latest
+    timeout-minutes: 120  # Set a 2-hour timeout
     permissions:
       contents: write
     

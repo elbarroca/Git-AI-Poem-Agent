@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import time
 import datetime
+import time
 from poem_automation import PoemAutomation
 from config import COHERE_API_KEY, REPO_PATH
 from pathlib import Path
@@ -22,26 +22,32 @@ def count_existing_poems(folder_path):
         return 0
     return len(list(folder_path.glob("[0-9][0-9]_RB_*.md")))
 
-def should_start_now():
-    """Determine if we should start now or wait for 8 AM"""
+def should_generate_poems():
+    """Determine if we should generate poems now"""
     now = datetime.datetime.now()
     automation = PoemAutomation(COHERE_API_KEY, REPO_PATH)
     folder_path = automation.get_or_create_daily_folder()
     
     existing_poems = count_existing_poems(folder_path)
     
-    # If we have no poems yet and it's before 8 AM, wait
+    # If we have all 28 poems, don't generate more
+    if existing_poems >= 28:
+        print("Already have 28 poems for today. No more poems needed.")
+        return False
+        
+    # If we have no poems and it's before 8 AM, don't start yet
     if existing_poems == 0 and now.hour < 8:
+        print("No poems yet and it's before 8 AM. Waiting for scheduled time.")
         return False
     
-    # If we have unfinished poems (less than 28), continue regardless of time
-    if existing_poems < 28:
-        return True
-    
-    # If all poems are done, wait for next day
-    return False
+    # If we have unfinished poems (less than 28), continue
+    return True
 
 def run_daily_automation():
+    if not should_generate_poems():
+        print("No poems to generate at this time.")
+        return
+        
     automation = PoemAutomation(COHERE_API_KEY, REPO_PATH)
     folder_path = automation.get_or_create_daily_folder()
     
@@ -54,7 +60,7 @@ def run_daily_automation():
     
     print(f"Found {existing_poems} existing poems. Starting from poem {start_number}")
     
-    # Generate remaining poems sequentially with 16-minute intervals
+    # Generate remaining poems sequentially with delays
     for poem_number in range(start_number, 29):  # Continue until we have all 28
         try:
             start_time = datetime.datetime.now()
@@ -73,45 +79,23 @@ def run_daily_automation():
                     print(f.read())
                     print("-" * 50)
                 
-                # Commit and push this poem before waiting
+                # Commit and push this poem
                 automation.git_commit_and_push(file_path)
                 print(f"Successfully committed and pushed poem {poem_number}")
                 
-                # Calculate time spent on creation and push
-                time_spent = (datetime.datetime.now() - start_time).total_seconds()
-                
-                # Wait remaining time to complete 8 minutes for operation if needed
-                if time_spent < 8 * 60:
-                    remaining_operation_time = (8 * 60) - time_spent
-                    print(f"\nWaiting {remaining_operation_time:.0f} seconds to complete 8-minute operation window...")
-                    time.sleep(remaining_operation_time)
-                
-                # If there's another poem to generate, wait 8 minutes
+                # Add a small delay between poems to avoid rate limiting
                 if poem_number < 28:
-                    print(f"Waiting 8 minutes before next poem...")
-                    time.sleep(8 * 60)  # 8 minutes wait
+                    delay_time = 30  # 30 seconds delay between poems
+                    print(f"Waiting {delay_time} seconds before next poem...")
+                    time.sleep(delay_time)
             
         except Exception as e:
             print(f"Error creating poem {poem_number}: {str(e)}")
-            # Wait a minute before retrying
-            time.sleep(60)
-            continue
+            # Wait a bit before failing
+            time.sleep(10)
+            raise  # Re-raise the exception to fail the GitHub Action
     
     print(f"\nCompleted daily automation at {datetime.datetime.now()}")
 
 if __name__ == "__main__":
-    while True:
-        if should_start_now():
-            # Run the automation immediately if we have unfinished poems
-            run_daily_automation()
-        else:
-            # Wait until next 8 AM if we're starting fresh
-            next_run = get_next_run_time()
-            now = datetime.datetime.now()
-            wait_seconds = (next_run - now).total_seconds()
-            
-            print(f"Waiting until {next_run.strftime('%Y-%m-%d %H:%M:%S')} to start automation...")
-            time.sleep(wait_seconds)
-            
-            # Run the automation
-            run_daily_automation() 
+    run_daily_automation() 
