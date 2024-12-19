@@ -8,9 +8,14 @@ on:
 jobs:
   generate_poems:
     runs-on: ubuntu-latest
-    timeout-minutes: 120  # Set a 2-hour timeout
+    timeout-minutes: 480  # Increased to 8 hours (480 minutes) to accommodate all 28 poems
     permissions:
       contents: write
+    
+    # Add concurrency to prevent multiple workflows from running simultaneously
+    concurrency:
+      group: poem-generation
+      cancel-in-progress: false  # Don't cancel in-progress runs
     
     steps:
     - name: Checkout repository
@@ -33,14 +38,11 @@ jobs:
         git config --global pull.ff false
         git config --global merge.ff false
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        git fetch origin main
-        git checkout main
-        git pull origin main --no-rebase
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install cohere gitpython python-dotenv
+        pip install -r requirements.txt
         
     - name: Create env file
       run: |
@@ -49,6 +51,12 @@ jobs:
         
     - name: Run Poem Generation
       run: |
+        # Ensure we're on main branch and up to date
+        git fetch origin main
+        git checkout main
+        git pull origin main --no-rebase
+        
+        # Run the automation
         python daily_automation.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

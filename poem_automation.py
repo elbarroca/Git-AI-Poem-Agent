@@ -177,70 +177,83 @@ class PoemAutomation:
             print(f"❌ Poem validation error: {str(e)}")
             return False
 
+    def generate_one_liner(self, themes_used, content_lines):
+        """Generate a dynamic Gen Z one-liner based on themes and content"""
+        theme_list = [t['theme'] for t in themes_used]
+        themes_text = ', '.join(theme_list)
+        content_preview = ' '.join(content_lines[:2])  # Use first two lines for context
+        
+        prompt = f"""
+        You are a Gen Z social media expert. Create a single fun, witty one-liner comment about a poem.
+        
+        The poem is about these themes: {themes_text}
+        Here's a preview: {content_preview}
+        
+        Rules for the one-liner:
+        - Must be exactly one line
+        - Use Gen Z slang and style
+        - Include 1-2 relevant emojis
+        - Keep it under 60 characters
+        - Make it fun and engaging
+        - Reference modern trends/culture
+        - Don't use hashtags
+        
+        Examples of good one-liners:
+        - vibing with the cosmic tea, no cap 🌌✨
+        - main character energy loading... 🚀
+        - living rent free in my head rn 🌟
+        - it's giving enlightenment fr fr ✨
+        """
+        
+        try:
+            response = self.cohere.chat(
+                message=prompt,
+                model="command-r-plus-08-2024",
+                temperature=0.93,
+                max_tokens=60
+            )
+            
+            one_liner = response.text.strip()
+            # Clean up the response
+            one_liner = one_liner.replace('"', '').replace('*', '').strip()
+            return one_liner
+            
+        except Exception as e:
+            self.logger.warning(f"Failed to generate custom one-liner: {str(e)}")
+            return "vibes so immaculate they transcend the timeline ✨"
+
     def format_poem_content(self, poem_text, themes_used):
         """Format the poem with enhanced Markdown in vertical format"""
         # Split into lines
         lines = poem_text.strip().split('\n')
         
         # Extract title and content
-        title = None
+        title = "Untitled"  # Default title
         content_lines = []
         
         for line in lines:
             line = line.strip()
             if line.startswith('Title:'):
                 title = line.replace('Title:', '').strip()
+            elif line.startswith('# '):
+                title = line.replace('# ', '').strip()
             elif title and line:  # Only include non-empty lines after title
                 content_lines.append(line)
+        
+        # Ensure we have a valid title
+        if not title or title == "Untitled":
+            self.logger.warning("No valid title found in poem, using generated title")
+            # Generate a title based on the first line if available
+            if content_lines:
+                title = f"Poem about {content_lines[0][:30]}..."
+            else:
+                title = f"Quantum Poem {datetime.datetime.now().strftime('%H:%M:%S')}"
         
         # Ensure we don't exceed 8 lines
         content_lines = content_lines[:8]
         
-        # Generate fun one-liner based on themes and content
-        one_liners = {
-            "Chinese Astrology": ["Zodiac vibes hitting different fr fr 🐲", "When the stars align but make it Gen Z"],
-            "Numerology": ["Numbers don't lie, but they do throw shade 🔢", "Math class but make it mystical"],
-            "Satirical Commentary": ["Spitting facts and taking names 🎭", "Reality check but make it funny"],
-            "Wealth and Freedom": ["Getting that bread, spiritually speaking 💰", "Rich in vibes, wealthy in wisdom"],
-            "Monkeys": ["Monke business going bananas 🐒", "Reject humanity, return to monke"],
-            "Technology and AI": ["AI and humans collabing, no cap 🤖", "When the robots pass the vibe check"],
-            "Traveling": ["Main character energy worldwide 🌍", "Passport stamps but make it poetic"],
-            "Gaming": ["Leveling up IRL and URL 🎮", "Touch grass? Nah, touch XP"],
-            "Botanic": ["Plant parents unite and photosyntheslay 🌸", "Grass touched, vibes received"],
-            "Penguins": ["Ice cold but make it waddle 🐧", "Squad goals: penguin edition"],
-            "Crypto": ["To the moon but make it philosophical 🚀", "HODL-ing onto dreams"],
-            "Japanese Philosophy": ["Zen and the art of keeping it real 🍵", "Finding peace in the chaos"]
-        }
-        
-        # Get primary theme and backup themes
-        primary_theme = themes_used[0]['theme'].split()[0] if themes_used else "Abstract"
-        theme_options = []
-        for theme in themes_used:
-            theme_key = theme['theme'].split()[0]
-            if theme_key in one_liners:
-                theme_options.extend(one_liners[theme_key])
-        
-        # Select a random one-liner from available themes
-        one_liner = random.choice(theme_options) if theme_options else "Vibes so good they transcend reality ✨"
-        
-        # Generate collection description based on themes
-        collection_descriptions = {
-            "Chinese Astrology": "Ancient wisdom meets modern perspective",
-            "Numerology": "Mystical patterns in everyday life",
-            "Satirical Commentary": "Sharp wit meets social insight",
-            "Wealth and Freedom": "Balance between material and spiritual",
-            "Monkeys": "Playful chaos and primal wisdom",
-            "Technology and AI": "Digital evolution and human connection",
-            "Traveling": "Journey through space and consciousness",
-            "Gaming": "Virtual realms and real-life parallels",
-            "Botanic": "Natural harmony and growth",
-            "Penguins": "Resilience and community spirit",
-            "Crypto": "Digital frontiers and financial freedom",
-            "Japanese Philosophy": "Eastern wisdom in modern times"
-        }
-        
-        # Get the primary theme (first theme used)
-        collection_desc = collection_descriptions.get(primary_theme, "A journey through consciousness and reality")
+        # Generate a dynamic one-liner
+        one_liner = self.generate_one_liner(themes_used, content_lines)
         
         # Format themes used
         theme_list = [t['theme'] for t in themes_used]
@@ -258,7 +271,7 @@ class PoemAutomation:
 *Generated on {datetime.datetime.now().strftime("%Y-%m-%d at %H:%M:%S")}*  
 **Creator**: Ricardo Barroca's AI Poetry Agent  
 {themes_section}  
-**Collection**: {collection_desc}"""
+**Collection**: A journey through consciousness and reality"""
         
         return formatted_content, title
 
@@ -301,8 +314,8 @@ class PoemAutomation:
                 "description": "Level ups and epic quests 🎮"
             },
             {
-                "theme": "Botanic",
-                "description": "Green wisdom and nature's art 🌸"
+                "theme": "Money Laundering",
+                "description": "Money laundering and tax evasion 💰"
             },
             {
                 "theme": "Penguins",
@@ -390,6 +403,7 @@ class PoemAutomation:
                 
                 # Validate basic structure
                 if self.validate_poem_structure(poem_text):
+                    # Ensure we return both the poem and themes
                     return poem_text, selected_themes
                 
                 print(f"Attempt {attempt + 1}: Invalid poem structure, retrying...")

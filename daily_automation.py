@@ -43,6 +43,32 @@ def should_generate_poems():
     # If we have unfinished poems (less than 28), continue
     return True
 
+def calculate_poem_schedule():
+    """Calculate the schedule for all 28 poems starting at 8 AM with 17-minute intervals"""
+    base_time = datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0)
+    
+    # If it's past 8 AM, use tomorrow
+    if datetime.datetime.now() >= base_time:
+        base_time = base_time + datetime.timedelta(days=1)
+    
+    # Generate schedule for all 28 poems (17 minutes apart)
+    schedule = []
+    for i in range(28):
+        poem_time = base_time + datetime.timedelta(minutes=i*17)  # Changed to 17 minutes
+        schedule.append(poem_time)
+    
+    return schedule
+
+def wait_until_next_poem(target_time):
+    """Wait precisely until the next scheduled poem time"""
+    now = datetime.datetime.now()
+    wait_time = (target_time - now).total_seconds()
+    
+    if wait_time > 0:
+        print(f"\nWaiting until {target_time.strftime('%H:%M:%S')} for next poem...")
+        print(f"Wait time: {wait_time/60:.1f} minutes")
+        time.sleep(wait_time)
+
 def run_daily_automation():
     if not should_generate_poems():
         print("No poems to generate at this time.")
@@ -54,15 +80,24 @@ def run_daily_automation():
     print(f"Starting automation at {datetime.datetime.now()}")
     print(f"Using folder: {folder_path}")
     
+    # Calculate schedule for all poems
+    schedule = calculate_poem_schedule()
+    
     # Count existing poems to determine where to start
     existing_poems = count_existing_poems(folder_path)
     start_number = existing_poems + 1
     
     print(f"Found {existing_poems} existing poems. Starting from poem {start_number}")
+    print("\nPoem Schedule:")
+    for i, time in enumerate(schedule[start_number-1:], start_number):
+        print(f"Poem {i}: {time.strftime('%H:%M:%S')}")
     
-    # Generate remaining poems sequentially with delays
-    for poem_number in range(start_number, 29):  # Continue until we have all 28
+    # Generate remaining poems according to schedule
+    for poem_number, target_time in enumerate(schedule[start_number-1:], start_number):
         try:
+            # Wait until the exact scheduled time
+            wait_until_next_poem(target_time)
+            
             start_time = datetime.datetime.now()
             print(f"\nGenerating poem {poem_number}/28 at {start_time}")
             
@@ -79,23 +114,46 @@ def run_daily_automation():
                     print(f.read())
                     print("-" * 50)
                 
+                # Add a small delay before git operations
+                time.sleep(2)
+                
                 # Commit and push this poem
                 automation.git_commit_and_push(file_path)
                 print(f"Successfully committed and pushed poem {poem_number}")
                 
-                # Add a small delay between poems to avoid rate limiting
+                # Calculate completion percentage
+                progress = (poem_number / 28) * 100
+                remaining = 28 - poem_number
+                print(f"\nProgress: {progress:.1f}% complete")
+                print(f"Remaining poems: {remaining}")
+                
+                # Calculate time spent on this poem
+                time_spent = (datetime.datetime.now() - start_time).total_seconds()
+                
                 if poem_number < 28:
-                    delay_time = 30  # 30 seconds delay between poems
-                    print(f"Waiting {delay_time} seconds before next poem...")
-                    time.sleep(delay_time)
+                    next_time = schedule[poem_number]
+                    time_until = next_time - datetime.datetime.now()
+                    print(f"Next poem scheduled for: {next_time.strftime('%H:%M:%S')}")
+                    print(f"Time until next poem: {time_until}")
+                    
+                    # If we finished early, wait the remaining time
+                    if time_until.total_seconds() > 0:
+                        print(f"Waiting {time_until.total_seconds():.0f} seconds until next scheduled poem...")
+                        time.sleep(time_until.total_seconds())
             
         except Exception as e:
             print(f"Error creating poem {poem_number}: {str(e)}")
-            # Wait a bit before failing
-            time.sleep(10)
-            raise  # Re-raise the exception to fail the GitHub Action
+            print("Full error details:")
+            print(traceback.format_exc())
+            
+            # Calculate retry time (2 minutes later)
+            retry_time = datetime.datetime.now() + datetime.timedelta(minutes=2)
+            print(f"Will retry poem {poem_number} at {retry_time.strftime('%H:%M:%S')}")
+            time.sleep(120)  # Wait 2 minutes before retry
+            continue
     
     print(f"\nCompleted daily automation at {datetime.datetime.now()}")
+    print(f"Total poems generated today: {count_existing_poems(folder_path)}")
 
 if __name__ == "__main__":
     run_daily_automation() 
