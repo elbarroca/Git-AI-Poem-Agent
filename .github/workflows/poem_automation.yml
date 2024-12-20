@@ -44,20 +44,36 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
+    - name: Debug Environment
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Repository path: ${{ github.workspace }}"
+        echo "Python version: $(python --version)"
+        echo "Pip version: $(pip --version)"
+        ls -la
+        
     - name: Create env file
       run: |
         echo "COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}" > .env
         echo "REPO_PATH=${{ github.workspace }}" >> .env
+        echo "Created .env file with contents:"
+        cat .env
         
     - name: Run Poem Generation
       run: |
+        # Debug info
+        echo "Starting poem generation at $(date)"
+        echo "Current directory: $(pwd)"
+        echo "Repository contents:"
+        ls -la
+        
         # Ensure we're on main branch and up to date
         git fetch origin main
         git checkout main
         git pull origin main --no-rebase
         
-        # Run the automation
-        python daily_automation.py
+        # Run with debug output
+        python -u daily_automation.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
@@ -66,3 +82,4 @@ jobs:
         GIT_AUTHOR_EMAIL: "btcto154k@gmail.com"
         GIT_COMMITTER_NAME: "elbarroca"
         GIT_COMMITTER_EMAIL: "btcto154k@gmail.com"
+        PYTHONUNBUFFERED: "1"  # Ensure Python output is not buffered
