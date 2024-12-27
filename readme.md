@@ -1,4 +1,4 @@
-# 🤖 Git-AI Poem Agent: Bussin' Bars While Git Stays Lit fr fr
+# 🤖 Git-AI Poem Agent: Bussin' Bars While Git Stays Lit fr
 
 _"AI's in the studio, dropping heat,  
 Twenty-eight commits make the day complete.  
