@@ -10,8 +10,9 @@ from pathlib import Path
 
 # Global retry configuration
 MAX_RETRIES = 8
-RETRY_DELAY = 8 # seconds
-POEM_INTERVAL = 17  # minutes between poems
+RETRY_DELAY = 8  # seconds
+POEM_INTERVAL = 8  # minutes between poems
+TOTAL_POEMS = 8  # Total number of poems to generate
 
 def print_debug_info():
     """Print debug information about the environment"""
@@ -44,9 +45,9 @@ def should_generate_poems():
         print(f"Current hour (local): {now.hour}")
         print(f"Current hour (UTC): {datetime.datetime.utcnow().hour}")
         
-        # If we have all 28 poems, don't generate more
-        if existing_poems >= 28:
-            print("Already have 28 poems for today. No more poems needed.")
+        # If we have all 8 poems, don't generate more
+        if existing_poems >= TOTAL_POEMS:
+            print(f"Already have {TOTAL_POEMS} poems for today. No more poems needed.")
             return False
         
         # Always generate if we have started (have some poems)
@@ -112,7 +113,7 @@ def run_daily_automation():
         print(f"Next poem scheduled for: {next_poem_time}")
         
         # Generate remaining poems
-        for poem_number in range(existing_poems + 1, 29):
+        for poem_number in range(existing_poems + 1, TOTAL_POEMS + 1):
             try:
                 # Wait until scheduled time
                 wait_time = (next_poem_time - datetime.datetime.now()).total_seconds()
@@ -120,7 +121,7 @@ def run_daily_automation():
                     print(f"\nWaiting {wait_time/60:.1f} minutes until {next_poem_time}")
                     time.sleep(wait_time)
                 
-                print(f"\nGenerating poem {poem_number}/28")
+                print(f"\nGenerating poem {poem_number}/{TOTAL_POEMS}")
                 file_path = automation.create_poem_file(folder_path, poem_number)
                 
                 if file_path and file_path.exists():
