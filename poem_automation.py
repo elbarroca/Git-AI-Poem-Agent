@@ -278,7 +278,6 @@ class PoemAutomation:
     def generate_poem(self, poem_number):
         """Generate a poem using Cohere API with context awareness"""
         context = self.get_poem_context()
-        
         # Define available themes
         themes = [
             {
@@ -328,6 +327,34 @@ class PoemAutomation:
             {
                 "theme": "Japanese Philosophy",
                 "description": "Zen vibes and mindful moments 🍵"
+            },
+            {
+                "theme": "Billionaire",
+                "description": "Living the luxury life and building empires 💎"
+            },
+            {
+                "theme": "Entrepreneur",
+                "description": "Hustling and grinding to success 💼"
+            },
+            {
+                "theme": "888K Month Soon",
+                "description": "Manifesting abundance and wealth goals 🎯"
+            },
+            {
+                "theme": "Gen Z Memes Lingo",
+                "description": "No cap fr fr, bussin vibes only 💅"
+            },
+            {
+                "theme": "League of Legends",
+                "description": "Mid diff and pentakills all day ⚔️"
+            },
+            {
+                "theme": "Humility",
+                "description": "Staying grounded while reaching heights 🙏"
+            },
+            {
+                "theme": "China Vibes",
+                "description": "Ancient wisdom meets modern power 🏮"
             }
         ]
         
@@ -593,7 +620,7 @@ class PoemAutomation:
             commit_message = f"""✨ Created Poem {poem_number}: {poem_title} 📝
 
 • Type: Daily Quantum Poetry
-• Number: Poem {poem_number} of 28
+• Number: Poem {poem_number} of 8
 • Path: {file_path.relative_to(self.repo_path)}
 • Timestamp: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
             
@@ -602,7 +629,7 @@ class PoemAutomation:
             self.repo.index.commit(commit_message)
             
             # Push changes with retry logic
-            max_retries = 3
+            max_retries = 8
             for attempt in range(max_retries):
                 try:
                     print(f"Pushing changes to origin/main (attempt {attempt + 1}/{max_retries})...")
@@ -613,8 +640,8 @@ class PoemAutomation:
                     if attempt == max_retries - 1:
                         raise
                     print(f"Push attempt {attempt + 1} failed: {str(e)}")
-                    print("Retrying in 5 seconds...")
-                    time.sleep(5)
+                    print("Retrying in 8 seconds...")
+                    time.sleep(8)
             
         except Exception as e:
             error_msg = f"Error in git operations: {str(e)}"
@@ -635,10 +662,10 @@ class PoemAutomation:
         self.logger.info(f"Found {existing_poems} existing poems. Starting from poem {start_number}")
         
         # Generate remaining poems sequentially with 8-minute intervals
-        for poem_number in range(start_number, 29):  # Continue until we have all 28
+        for poem_number in range(start_number, 9):  # Continue until we have all 8
             try:
                 start_time = datetime.datetime.now()
-                self.logger.info(f"\nGenerating poem {poem_number}/28 at {start_time}")
+                self.logger.info(f"\nGenerating poem {poem_number}/8 at {start_time}")
                 
                 # Create the poem
                 file_path = self.create_poem_file(folder_path, poem_number)
@@ -668,14 +695,14 @@ class PoemAutomation:
                         time.sleep(remaining_operation_time)
                     
                     # If there's another poem to generate, wait 8 minutes
-                    if poem_number < 28:
+                    if poem_number < 8:
                         self.logger.info(f"Waiting 8 minutes before next poem...")
                         time.sleep(8 * 60)  # 8 minutes wait
                 
             except Exception as e:
                 self.logger.error(f"Error creating poem {poem_number}: {str(e)}")
-                # Wait a minute before retrying
-                time.sleep(60)
+                # Wait 8 seconds before retrying
+                time.sleep(8)
                 continue
         
         self.logger.info(f"\nCompleted daily automation at {datetime.datetime.now()}") 
