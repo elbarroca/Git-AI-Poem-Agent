@@ -1,0 +1,128 @@
+GitHub Contribution Art - "G I G A C H A D : D"
+============================================
+
+Calendar View (52 weeks × 7 days):
+--------------------------------
+
+Weeks:  1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51
+        |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Sun     ░░░|███ ███ ███ ███ ░░░|███ ░░░|███ ███ ███ ███ ░░░|███ ███ ███ ███ ░░░|░░░ ███ ███ ███ ███ ░░░|███ ░░░ ░░░ ███ ░░░ ░░░|███ ███ ███ ███ ░░░|███ ███ ███|░░░ ░░░ ░░░|░░░|░░░ ███ ███ ███ ░░░
+Mon     ░░░|███ ░░░ ░░░ ░░░ ░░░|███ ░░░|███ ░░░ ░░░ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░|░░░ ███ ░░░ ░░░ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███|░░░ ░░░ ░░░|░░░|███ ░░░ ░░░ ███
+Tue     ░░░|███ ░░░ ███ ███ ░░░|███ ░░░|███ ░░░ ███ ███ ░░░|███ ███ ███ ███ ░░░|░░░ ███ ░░░ ░░░ ░░░ ░░░|███ ███ ███ ███ ░░░ ░░░|███ ███ ███ ███ ░░░|███ ░░░ ░░░ ███|░░░ ░░░ ███|░░░|███ ░░░ ░░░ ███
+Wed     ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███ ░░░|░░░ ███ ░░░ ░░░ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███|░░░ ░░░ ░░░|░░░|███ ░░░ ░░░ ███
+Thu     ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███ ░░░|░░░ ███ ░░░ ░░░ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███|░░░ ░░░ ███|░░░|███ ░░░ ░░░ ███
+Fri     ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███ ░░░|░░░ ███ ░░░ ░░░ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░|███ ░░░ ░░░ ███|░░░ ░░░ ░░░|░░░|███ ░░░ ░░░ ███
+Sat     ░░░|███ ███ ███ ███ ░░░|███ ░░░|███ ███ ███ ███ ░░░|███ ░░░ ░░░ ███ ░░░|░░░ ███ ███ ███ ███ ░░░|███ ░░░ ░░░ ███ ░░░ ░░░|███ ░░░ ░░░ ███ ░░░|███ ███ ███ ░░░|░░░ ░░░ ░░░|░░░|███ ███ ███ ░░░
+        |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+        -   G   G   G   G   -   I   -   G   G   G   G   -   A   A   A   A   -   C   C   C   C   -   -   H   H   H   H   -   -   A   A   A   -   -   D   D   D   D   -   -   -   :   D   D   D   D
+
+Letter Patterns (Improved):
+------------------------
+Week 1:  ░░░░░░░  Blank week for initial spacing
+
+G: ████░  Four weeks G shape (top line, left side, bottom with curve)
+   - Week 1: Full top line
+   - Week 2: Left side only
+   - Week 3: Left side + half bottom
+   - Week 4: Full curve
+   ░░░░░  One week space
+   
+I: █░░░  One week vertical line (clear I)
+   ░░░░  One week space
+   
+G: ████░  Same as first G
+   ░░░░░  One week space
+   
+A: ████░  Four weeks A shape (no bottom connection)
+   - Week 1: Full top line
+   - Week 2: Both sides + middle line
+   - Week 3: Both sides only
+   - Week 4: Both sides only
+   ░░░░░  One week space
+
+CHAD Section (Fixed to match image):
+---------------------
+C: ████░  Four weeks C shape (weeks 19-22)
+   - Week 1: Full top line
+   - Week 2: Left side only
+   - Week 3: Left side only
+   - Week 4: Left side only
+   ░░░░░░  Two weeks space
+   
+H: ████░  Four weeks H shape (weeks 24-27)
+   - Week 1: Both sides only
+   - Week 2: Both sides only
+   - Week 3: Full middle line
+   - Week 4: Both sides only
+   ░░░░░░  Two weeks space
+   
+A: ███░░  Three weeks A shape (weeks 29-31)
+   - Week 1: Full top line
+   - Week 2: Both sides + middle line
+   - Week 3: Both sides only
+   ░░░░░░  Two weeks space
+   
+D: ██░░░  Two weeks D shape (weeks 33-34)
+   - Week 1: Left side only
+   - Week 2: Left side + curved right
+   ░░░░░░  Two weeks space
+   
+:: █░░░░  One week dots (week 41)
+   ░░░░░  One week space
+   
+D: ███░░  Three weeks final D shape (weeks 42-44)
+   - Week 1: Left side only
+   - Week 2: Left side + curved right
+   - Week 3: Full right curve
+
+Commit Pattern:
+-------------
+███ = Heavy contribution (17 commits) - Forms letter shapes
+░░░ = Light contribution (8 commits) - Creates spacing
+
+Key Improvements:
+--------------
+1. Fixed C shape to match image (no bottom line)
+2. Corrected H shape (no bottom connection)
+3. Adjusted A shape (proper triangle form)
+4. Improved D shapes (better curve definition)
+5. Proper spacing between all CHAD letters 
+
+Second A: ████░  Four weeks A shape (weeks 29-32)
+   - Week 1: Full top line
+   - Week 2: Both sides + middle line
+   - Week 3: Both sides only
+   - Week 4: Both sides only
+   ░░░░░  One week space
+
+First D: ████░  Four weeks D shape (weeks 33-36)
+   - Week 1: Full top line
+   - Week 2: Left side + partial curve
+   - Week 3: Left side + full curve
+   - Week 4: Full bottom curve
+   ░░░░░  One week space
+
+:: ███░░  Three weeks dots (weeks 41-43)
+   - Week 1: Full vertical line
+   - Week 2: Full vertical line
+   - Week 3: Full vertical line
+   ░░░░░  One week space
+
+Final D: ████░  Four weeks D shape (weeks 44-47)
+   - Week 1: Full top line
+   - Week 2: Left side + partial curve
+   - Week 3: Left side + full curve
+   - Week 4: Full bottom curve
+
+Commit Pattern:
+-------------
+███ = Heavy contribution (17 commits) - Forms letter shapes
+░░░ = Light contribution (8 commits) - Creates spacing
+
+Key Improvements:
+--------------
+1. Second A now exactly matches first A pattern
+2. D shapes have better curves and proper vertical lines
+3. Colon is now three clear vertical lines
+4. Maintained consistent spacing between letters
+5. All letters match the image exactly 

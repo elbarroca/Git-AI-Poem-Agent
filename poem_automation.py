@@ -7,6 +7,8 @@ from pathlib import Path
 import time
 import logging
 from logging.handlers import RotatingFileHandler
+import json
+import traceback
 
 class PoemAutomation:
     def __init__(self, cohere_api_key, repo_path):
@@ -341,6 +343,30 @@ class PoemAutomation:
                 "description": "Manifesting abundance and wealth goals 🎯"
             },
             {
+                "theme": "888 Wealth",
+                "description": "Manifesting 888 and abundance vibes 💰"
+            },
+            {
+                "theme": "2025 Vision",
+                "description": "The gigachad year of pure success 🔥"
+            },
+            {
+                "theme": "Gigachad Life",
+                "description": "Breaking rules, making moves, staying alpha 💪"
+            },
+            {
+                "theme": "Blonde Beauty",
+                "description": "Golden hair and gorgeous vibes ✨"
+            },
+            {
+                "theme": "Italian Wife",
+                "description": "La dolce vita with amore 💝"
+            },
+            {
+                "theme": "Roman Empire",
+                "description": "Living that Italian luxury lifestyle 🏛️"
+            },
+            {
                 "theme": "Gen Z Memes Lingo",
                 "description": "No cap fr fr, bussin vibes only 💅"
             },
@@ -648,24 +674,99 @@ class PoemAutomation:
             print(f"❌ {error_msg}")
             raise RuntimeError(error_msg)
     
+    def test_daily_pattern(self):
+        """Test if the daily pattern detection is working correctly"""
+        self.logger.info("\n=== Testing Daily Pattern System ===")
+        
+        # Read the commit pattern file
+        pattern_file = self.repo_path / "commit_pattern.json"
+        if not pattern_file.exists():
+            self.logger.error("❌ commit_pattern.json not found!")
+            return False
+            
+        try:
+            # Load the pattern
+            with open(pattern_file, 'r') as f:
+                commit_pattern = json.load(f)
+            
+            # Test current date
+            today = datetime.datetime.now()
+            today_str = today.strftime('%Y-%m-%d')
+            num_commits = commit_pattern.get(today_str, 8)
+            
+            self.logger.info(f"\nToday ({today_str}):")
+            self.logger.info(f"Required commits: {num_commits}")
+            self.logger.info(f"Pattern type: {'Heavy (Pattern Day)' if num_commits == 17 else 'Normal Day'}")
+            
+            # Test next 7 days
+            self.logger.info("\nNext 7 days preview:")
+            self.logger.info("-" * 50)
+            
+            for i in range(7):
+                test_date = today + datetime.timedelta(days=i)
+                date_str = test_date.strftime('%Y-%m-%d')
+                commits = commit_pattern.get(date_str, 8)
+                
+                self.logger.info(f"Date: {date_str} ({test_date.strftime('%A')})")
+                self.logger.info(f"Commits: {commits} ({'Heavy' if commits == 17 else 'Normal'})")
+                self.logger.info("-" * 50)
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error testing pattern: {str(e)}")
+            self.logger.error(traceback.format_exc())
+            return False
+
     def run_daily_automation(self):
         """Run the daily automation process"""
+        # First, test the pattern system
+        self.logger.info("\nTesting commit pattern system...")
+        if not self.test_daily_pattern():
+            self.logger.error("Pattern system test failed! Please check commit_pattern.json")
+            return
+            
         folder_path = self.get_or_create_daily_folder()
         
-        self.logger.info(f"Starting automation at {datetime.datetime.now()}")
+        self.logger.info(f"\nStarting automation at {datetime.datetime.now()}")
         self.logger.info(f"Using folder: {folder_path}")
+        
+        # Read the commit pattern from commit_pattern.json
+        pattern_file = self.repo_path / "commit_pattern.json"
+        if not pattern_file.exists():
+            self.logger.warning("No commit_pattern.json found. Using default 8 commits.")
+            num_commits = 8
+        else:
+            try:
+                with open(pattern_file, 'r') as f:
+                    commit_pattern = json.load(f)
+                
+                # Get today's date in YYYY-MM-DD format
+                today = datetime.datetime.now().strftime('%Y-%m-%d')
+                
+                # Get number of commits for today from pattern
+                num_commits = commit_pattern.get(today, 8)  # Default to 8 if date not found
+                
+                self.logger.info(f"\nDate: {today}")
+                self.logger.info(f"Commits required today: {num_commits}")
+                
+            except Exception as e:
+                self.logger.error(f"Error reading commit pattern: {str(e)}", exc_info=True)
+                self.logger.warning("Falling back to default 8 commits")
+                num_commits = 8
         
         # Count existing poems to determine where to start
         existing_poems = len(list(folder_path.glob("[0-9][0-9]_RB_*.md")))
         start_number = existing_poems + 1
         
         self.logger.info(f"Found {existing_poems} existing poems. Starting from poem {start_number}")
+        self.logger.info(f"Target number of poems for today: {num_commits}")
         
-        # Generate remaining poems sequentially with 8-minute intervals
-        for poem_number in range(start_number, 9):  # Continue until we have all 8
+        # Generate remaining poems sequentially with dynamic timing
+        for poem_number in range(start_number, num_commits + 1):
             try:
                 start_time = datetime.datetime.now()
-                self.logger.info(f"\nGenerating poem {poem_number}/8 at {start_time}")
+                self.logger.info(f"\nGenerating poem {poem_number}/{num_commits} at {start_time}")
                 
                 # Create the poem
                 file_path = self.create_poem_file(folder_path, poem_number)
@@ -685,24 +786,26 @@ class PoemAutomation:
                     self.git_commit_and_push(file_path)
                     self.logger.info(f"Successfully committed and pushed poem {poem_number}")
                     
-                    # Calculate time spent on creation and push
+                    # Calculate time spent and determine wait time
                     time_spent = (datetime.datetime.now() - start_time).total_seconds()
+                    operation_window = 480 // num_commits  # Distribute 8 hours (480 minutes) across all poems
                     
-                    # Wait remaining time to complete 8 minutes for operation if needed
-                    if time_spent < 8 * 60:
-                        remaining_operation_time = (8 * 60) - time_spent
-                        self.logger.info(f"\nWaiting {remaining_operation_time:.0f} seconds to complete 8-minute operation window...")
-                        time.sleep(remaining_operation_time)
+                    # Wait remaining time to complete operation window if needed
+                    if time_spent < operation_window * 60:
+                        remaining_time = (operation_window * 60) - time_spent
+                        self.logger.info(f"\nWaiting {remaining_time:.0f} seconds to complete {operation_window}-minute operation window...")
+                        time.sleep(remaining_time)
                     
-                    # If there's another poem to generate, wait 8 minutes
-                    if poem_number < 8:
-                        self.logger.info(f"Waiting 8 minutes before next poem...")
-                        time.sleep(8 * 60)  # 8 minutes wait
+                    # If there's another poem to generate, add a small buffer
+                    if poem_number < num_commits:
+                        buffer_time = 30  # 30 seconds buffer
+                        self.logger.info(f"Adding {buffer_time} second buffer before next poem...")
+                        time.sleep(buffer_time)
                 
             except Exception as e:
-                self.logger.error(f"Error creating poem {poem_number}: {str(e)}")
-                # Wait 8 seconds before retrying
-                time.sleep(8)
+                self.logger.error(f"Error creating poem {poem_number}: {str(e)}", exc_info=True)
+                # Wait before retrying
+                time.sleep(30)
                 continue
         
         self.logger.info(f"\nCompleted daily automation at {datetime.datetime.now()}") 
