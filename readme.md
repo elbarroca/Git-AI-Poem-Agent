@@ -50,6 +50,22 @@ Because we're tired of:
 - **Git Integration**: Handles commits and pushes automatically
 - **Error Handling**: Keeps it pushing even when things get weird
 
+## ✨ Personalization Guidelines  
+
+Want to make it truly yours? Here’s how:  
+
+### 1️⃣ Choose Your Themes  
+- Update the **themes** list in `PoemAutomation.py` to include topics that matter to you—whether it’s inspiration, humor, or something niche.  
+
+### 2️⃣ Customize Your Prompts  
+- Edit the **prompt templates** in `PoemAutomation.py` to craft the type of poems you want (e.g., motivational, funny, or even in Gen-Z lingo).  
+
+### 3️⃣ Adapt for Local Logs  
+- Modify the settings in `config.py` to log poems locally instead of committing to GitHub.  
+
+### 4️⃣ Set Environment Variables  
+- Use `.tmv` files to securely set your Cohere API key and other sensitive configurations.  
+
 ## 🚀 Get This Party Started
 
 ### Prerequisites
